@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Freelance Rate Calculator</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<style>
+
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:#f4f6f8;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+flex-direction:column;
+}
+
+.card{
+background:white;
+padding:35px;
+border-radius:12px;
+box-shadow:0 15px 40px rgba(0,0,0,0.1);
+width:420px;
+}
+
+.language{
+margin-bottom:15px;
+text-align:right;
+}
+
+h1{
+text-align:center;
+margin-top:0;
+}
+
+label{
+font-size:14px;
+color:#555;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+button{
+background:#4CAF50;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#43a047;
+}
+
+.result{
+margin-top:20px;
+font-size:18px;
+text-align:center;
+line-height:1.6;
+}
+
+.copy{
+background:#2196F3;
+margin-top:10px;
+}
+
+.copy:hover{
+background:#1e88e5;
+}
+
+.footer{
+margin-top:20px;
+font-size:12px;
+color:#777;
+text-align:center;
+}
+
+/* TOAST NOTIFICATION */
+
+#toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#333;
+color:white;
+padding:12px 20px;
+border-radius:8px;
+font-size:14px;
+opacity:0;
+pointer-events:none;
+transition:opacity 0.4s, transform 0.4s;
+}
+
+#toast.show{
+opacity:1;
+transform:translate(-50%,-10px);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="language">
+<select id="language" onchange="setLanguage()">
+<option value="en">English</option>
+<option value="es">Español</option>
+</select>
+</div>
+
+<h1 id="title">Freelance Rate Calculator</h1>
+
+<label id="labelIncome">Desired Monthly Income ($)</label>
+<input id="income" type="number" placeholder="4000">
+
+<label id="labelExpenses">Monthly Expenses ($)</label>
+<input id="expenses" type="number" placeholder="1000">
+
+<label id="labelHours">Hours per week</label>
+<input id="hours" type="number" placeholder="40">
+
+<button id="calcButton" onclick="calculate()">Calculate Rate</button>
+
+<div class="result" id="result"></div>
+
+<button class="copy" id="copyButton" onclick="copyResult()">Copy Result</button>
+
+</div>
+
+<div class="footer">
+<span id="footerText">Simple tool for freelancers</span>
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+let resultText = "";
+
+function calculate(){
+
+let income = Number(document.getElementById("income").value);
+let expenses = Number(document.getElementById("expenses").value);
+let hours = Number(document.getElementById("hours").value);
+let lang = document.getElementById("language").value;
+
+if(!income || !hours){
+
+if(lang === "es"){
+document.getElementById("result").innerHTML = "Por favor completa los campos necesarios";
+}else{
+document.getElementById("result").innerHTML = "Please fill required fields";
+}
+
+return;
+
+}
+
+let monthlyGoal = income + expenses;
+let monthlyHours = hours * 4;
+let yearlyIncome = monthlyGoal * 12;
+let rate = monthlyGoal / monthlyHours;
+
+if(lang === "es"){
+
+resultText =
+"Tarifa por hora: $" + rate.toFixed(2) +
+"<br>Objetivo mensual: $" + monthlyGoal +
+"<br>Objetivo anual: $" + yearlyIncome;
+
+}else{
+
+resultText =
+"Hourly Rate: $" + rate.toFixed(2) +
+"<br>Monthly Goal: $" + monthlyGoal +
+"<br>Yearly Target: $" + yearlyIncome;
+
+}
+
+document.getElementById("result").innerHTML = resultText;
+
+}
+
+function copyResult(){
+
+if(!resultText) return;
+
+navigator.clipboard.writeText(resultText.replace(/<br>/g,"\n"));
+
+let lang = document.getElementById("language").value;
+
+if(lang === "es"){
+showToast("Resultado copiado");
+}else{
+showToast("Result copied");
+}
+
+}
+
+function showToast(message){
+
+let toast = document.getElementById("toast");
+
+toast.innerText = message;
+toast.classList.add("show");
+
+setTimeout(function(){
+toast.classList.remove("show");
+},2000);
+
+}
+
+function setLanguage(){
+
+let lang = document.getElementById("language").value;
+
+localStorage.setItem("lang",lang);
+
+if(lang === "es"){
+
+document.getElementById("title").innerText = "Calculadora de Tarifas Freelance";
+document.getElementById("labelIncome").innerText = "Ingreso mensual deseado ($)";
+document.getElementById("labelExpenses").innerText = "Gastos mensuales ($)";
+document.getElementById("labelHours").innerText = "Horas por semana";
+document.getElementById("calcButton").innerText = "Calcular tarifa";
+document.getElementById("copyButton").innerText = "Copiar resultado";
+document.getElementById("footerText").innerText = "Herramienta simple para freelancers";
+
+}
+
+if(lang === "en"){
+
+document.getElementById("title").innerText = "Freelance Rate Calculator";
+document.getElementById("labelIncome").innerText = "Desired Monthly Income ($)";
+document.getElementById("labelExpenses").innerText = "Monthly Expenses ($)";
+document.getElementById("labelHours").innerText = "Hours per week";
+document.getElementById("calcButton").innerText = "Calculate Rate";
+document.getElementById("copyButton").innerText = "Copy Result";
+document.getElementById("footerText").innerText = "Simple tool for freelancers";
+
+}
+
+}
+
+window.onload = function(){
+
+let savedLang = localStorage.getItem("lang");
+
+if(savedLang){
+
+document.getElementById("language").value = savedLang;
+setLanguage();
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
