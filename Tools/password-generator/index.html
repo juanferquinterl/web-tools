@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Generator | Free Tool</title>
+<meta name="description" content="Free password generator. Create strong passwords with options for length, symbols, numbers, and uppercase letters.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:#f4f6f8;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+flex-direction:column;
+}
+.card{
+background:white;
+padding:35px;
+border-radius:12px;
+box-shadow:0 15px 40px rgba(0,0,0,0.1);
+width:420px;
+}
+.language{
+margin-bottom:15px;
+text-align:right;
+}
+h1{
+text-align:center;
+margin-top:0;
+}
+label{
+font-size:14px;
+color:#555;
+}
+input[type=number], button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:16px;
+}
+.checkbox-group{
+margin:8px 0;
+font-size:14px;
+color:#555;
+}
+button{
+background:#4CAF50;
+color:white;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+button:hover{
+background:#43a047;
+}
+.result{
+margin-top:20px;
+font-size:18px;
+text-align:center;
+line-height:1.6;
+word-break:break-all;
+}
+.copy{
+background:#2196F3;
+margin-top:10px;
+}
+.copy:hover{
+background:#1e88e5;
+}
+#toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#333;
+color:white;
+padding:12px 20px;
+border-radius:8px;
+font-size:14px;
+opacity:0;
+pointer-events:none;
+transition:opacity 0.4s, transform 0.4s;
+}
+#toast.show{
+opacity:1;
+transform:translate(-50%,-10px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="language">
+<select id="language" onchange="setLanguage()">
+<option value="en">English</option>
+<option value="es">Español</option>
+</select>
+</div>
+
+<h1 id="title">Password Generator</h1>
+
+<label id="labelLength">Password Length</label>
+<input id="length" type="number" placeholder="12" min="4" max="128">
+
+<div class="checkbox-group">
+<input type="checkbox" id="uppercase" checked> <span id="labelUppercase">Include Uppercase</span><br>
+<input type="checkbox" id="numbers" checked> <span id="labelNumbers">Include Numbers</span><br>
+<input type="checkbox" id="symbols" checked> <span id="labelSymbols">Include Symbols</span>
+</div>
+
+<button id="genButton" onclick="generatePassword()">Generate Password</button>
+
+<div class="result" id="result"></div>
+
+<button class="copy" id="copyButton" onclick="copyPassword()">Copy Password</button>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+let passwordText = "";
+
+function generatePassword(){
+let length = Number(document.getElementById("length").value);
+let includeUpper = document.getElementById("uppercase").checked;
+let includeNumbers = document.getElementById("numbers").checked;
+let includeSymbols = document.getElementById("symbols").checked;
+let lang = document.getElementById("language").value;
+
+if(!length || length < 4){
+if(lang === "es"){
+document.getElementById("result").innerText = "Ingresa un número válido (mínimo 4)";
+}else{
+document.getElementById("result").innerText = "Enter a valid number (minimum 4)";
+}
+return;
+}
+
+let lowerChars = "abcdefghijklmnopqrstuvwxyz";
+let upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let numberChars = "0123456789";
+let symbolChars = "!@#$%^&*()_+[]{}|;:,.<>?/";
+
+let chars = lowerChars;
+if(includeUpper) chars += upperChars;
+if(includeNumbers) chars += numberChars;
+if(includeSymbols) chars += symbolChars;
+
+passwordText = "";
+for(let i=0; i<length; i++){
+passwordText += chars.charAt(Math.floor(Math.random()*chars.length));
+}
+
+document.getElementById("result").innerText = passwordText;
+}
+
+function copyPassword(){
+if(!passwordText) return;
+
+navigator.clipboard.writeText(passwordText);
+
+let lang = document.getElementById("language").value;
+if(lang === "es") showToast("Contraseña copiada");
+else showToast("Password copied");
+}
+
+function showToast(message){
+let toast = document.getElementById("toast");
+toast.innerText = message;
+toast.classList.add("show");
+setTimeout(function(){toast.classList.remove("show");},2000);
+}
+
+function setLanguage(){
+let lang = document.getElementById("language").value;
+localStorage.setItem("lang", lang);
+
+if(lang === "es"){
+document.getElementById("title").innerText = "Generador de Contraseñas";
+document.getElementById("labelLength").innerText = "Longitud de la contraseña";
+document.getElementById("labelUppercase").innerText = "Incluir mayúsculas";
+document.getElementById("labelNumbers").innerText = "Incluir números";
+document.getElementById("labelSymbols").innerText = "Incluir símbolos";
+document.getElementById("genButton").innerText = "Generar contraseña";
+document.getElementById("copyButton").innerText = "Copiar contraseña";
+}else{
+document.getElementById("title").innerText = "Password Generator";
+document.getElementById("labelLength").innerText = "Password Length";
+document.getElementById("labelUppercase").innerText = "Include Uppercase";
+document.getElementById("labelNumbers").innerText = "Include Numbers";
+document.getElementById("labelSymbols").innerText = "Include Symbols";
+document.getElementById("genButton").innerText = "Generate Password";
+document.getElementById("copyButton").innerText = "Copy Password";
+}
+}
+
+window.onload = function(){
+let savedLang = localStorage.getItem("lang");
+if(savedLang){
+document.getElementById("language").value = savedLang;
+setLanguage();
+}
+}
+</script>
+
+</body>
+</html>

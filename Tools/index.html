@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Web Tools | Free Tools</title>
+<meta name="description" content="Mini site with useful web tools: Freelance Rate Calculator, Password Generator, and more coming soon.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<style>
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  background:#f4f6f8;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:100vh;
+  margin:0;
+  padding:30px;
+}
+h1{
+  text-align:center;
+  margin-bottom:40px;
+}
+.tools-container{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.tool-card{
+  background:white;
+  padding:25px 30px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  width:300px;
+  margin:15px;
+  text-align:center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor:pointer;
+  text-decoration:none;
+  color:#333;
+}
+.tool-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+}
+.tool-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+.tool-desc{
+  font-size:14px;
+  color:#555;
+}
+.footer{
+  margin-top:50px;
+  font-size:12px;
+  color:#777;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<h1>My Web Tools</h1>
+
+<div class="tools-container">
+  <a class="tool-card" href="./freelance-rate-calculator/index.html">
+    <div class="tool-title">Freelance Rate Calculator</div>
+    <div class="tool-desc">Calculate your ideal hourly rate as a freelancer.</div>
+  </a>
+  
+  <a class="tool-card" href="./password-generator/index.html">
+    <div class="tool-title">Password Generator</div>
+    <div class="tool-desc">Generate strong passwords with options for length, symbols, numbers, and uppercase letters.</div>
+  </a>
+</div>
+
+<div class="footer">
+&copy; 2026 JuanFerQuinterl | Free web tools
+</div>
+
+</body>
+</html>
