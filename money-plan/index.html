@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money-Plan | Calculadora de Ahorro</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background:#f0f2f5; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+    .container { background:#fff; padding:30px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); max-width:450px; width:100%; }
+    h1 { text-align:center; margin-bottom:20px; color:#333; }
+    label { display:block; margin-top:15px; font-weight:600; color:#555; }
+    input[type="number"], select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+    input[type="range"] { width:100%; margin-top:5px; }
+    .output { margin-top:20px; background:#f7f9fc; padding:15px; border-radius:8px; border:1px solid #e1e4eb; text-align:center; font-size:18px; color:#333; min-height:50px; }
+    button { margin-top:20px; width:100%; padding:12px; background-color:#4CAF50; color:white; font-size:16px; font-weight:bold; border:none; border-radius:8px; cursor:pointer; transition:background 0.3s ease; }
+    button:hover { background-color:#45a049; }
+    .footer { text-align:center; margin-top:15px; font-size:14px; color:#777; }
+    @media(max-width:500px){ .container{ padding:20px; } }
+
+    /* Toast moderno */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">Money-Plan</h1>
+
+    <label for="langSelect" id="langLabel">Idioma / Language:</label>
+    <select id="langSelect">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+
+    <p id="description">Calcula cuánto puedes ahorrar al mes y al año según tus ingresos, gastos y porcentaje a ahorrar.</p>
+
+    <label for="income" id="incomeLabel">Ingreso mensual ($):</label>
+    <input type="number" id="income" placeholder="Ej: 1500">
+
+    <label for="expenses" id="expensesLabel">Gastos mensuales ($):</label>
+    <input type="number" id="expenses" placeholder="Ej: 800">
+
+    <label for="savePercent" id="percentLabelText">Porcentaje a ahorrar (%): <span id="percentLabel">20</span>%</label>
+    <input type="range" id="savePercent" min="0" max="100" value="20">
+
+    <div class="output" id="output">Ingresa tus datos y presiona "Calcular ahorro"</div>
+
+    <button id="calculateBtn">Calcular ahorro</button>
+    <button id="copyBtn">Copiar resultados</button>
+
+    <div class="footer">Money-Plan &copy; 2026</div>
+  </div>
+
+  <!-- Toast moderno -->
+  <div id="toast"></div>
+
+  <script>
+    // Elementos
+    const langSelect = document.getElementById('langSelect');
+    const title = document.getElementById('title');
+    const description = document.getElementById('description');
+    const incomeLabel = document.getElementById('incomeLabel');
+    const expensesLabel = document.getElementById('expensesLabel');
+    const percentLabelText = document.getElementById('percentLabelText');
+    const percentLabel = document.getElementById('percentLabel');
+    const outputDiv = document.getElementById('output');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const savePercent = document.getElementById('savePercent');
+
+    // Traducciones
+    const translations = {
+      es: {
+        title: "Money-Plan",
+        description: "Calcula cuánto puedes ahorrar al mes y al año según tus ingresos, gastos y porcentaje a ahorrar.",
+        income: "Ingreso mensual ($):",
+        expenses: "Gastos mensuales ($):",
+        percentText: "Porcentaje a ahorrar (%):",
+        outputDefault: 'Ingresa tus datos y presiona "Calcular ahorro"',
+        calculateBtn: "Calcular ahorro",
+        copyBtn: "Copiar resultados",
+        copyAlert: "Resultados copiados al portapapeles",
+        invalid: "Por favor ingresa valores válidos."
+      },
+      en: {
+        title: "Money-Plan",
+        description: "Calculate how much you can save per month and per year based on your income, expenses and saving percentage.",
+        income: "Monthly income ($):",
+        expenses: "Monthly expenses ($):",
+        percentText: "Saving percentage (%):",
+        outputDefault: 'Enter your data and press "Calculate savings"',
+        calculateBtn: "Calculate savings",
+        copyBtn: "Copy results",
+        copyAlert: "Results copied to clipboard",
+        invalid: "Please enter valid values."
+      }
+    };
+
+    // Actualiza idioma
+    function updateLanguage(lang){
+      const t = translations[lang];
+      title.textContent = t.title;
+      description.textContent = t.description;
+      incomeLabel.textContent = t.income;
+      expensesLabel.textContent = t.expenses;
+      percentLabelText.childNodes[0].textContent = t.percentText + " ";
+      outputDiv.textContent = t.outputDefault;
+      calculateBtn.textContent = t.calculateBtn;
+      copyBtn.textContent = t.copyBtn;
+    }
+
+    langSelect.addEventListener('change', () => updateLanguage(langSelect.value));
+
+    // Slider dinámico
+    savePercent.addEventListener('input', () => {
+      percentLabel.textContent = savePercent.value;
+    });
+
+    // Calcular ahorro
+    function calculateSavings() {
+      const income = parseFloat(document.getElementById('income').value);
+      const expenses = parseFloat(document.getElementById('expenses').value);
+      const percent = parseFloat(savePercent.value);
+      const lang = langSelect.value;
+
+      if(isNaN(income) || isNaN(expenses) || income < 0 || expenses < 0 || percent < 0){
+        outputDiv.textContent = translations[lang].invalid;
+        return;
+      }
+
+      const monthlySaving = ((income - expenses) * (percent / 100));
+      const annualSaving = monthlySaving * 12;
+
+      outputDiv.innerHTML = `
+        <strong>${lang === "es" ? "Ahorro mensual" : "Monthly saving"}:</strong> $${monthlySaving.toFixed(2)}<br>
+        <strong>${lang === "es" ? "Ahorro anual" : "Annual saving"}:</strong> $${annualSaving.toFixed(2)}
+      `;
+    }
+
+    calculateBtn.addEventListener('click', calculateSavings);
+
+    // Toast moderno
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.display = 'block';
+      toast.style.opacity = 1;
+
+      setTimeout(() => {
+        toast.style.opacity = 0;
+      }, 2000);
+
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2500);
+    }
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputDiv.textContent).then(() => {
+        showToast(translations[langSelect.value].copyAlert);
+      });
+    });
+
+    // Inicializa idioma
+    updateLanguage('es');
+  </script>
+</body>
+</html>
